@@ -14,6 +14,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { jwtConstants } from './auth/constants';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
+import { MulterModule } from '@nestjs/platform-express';
 
 
 @Module({
@@ -48,6 +49,11 @@ import { join } from 'path';
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, '..', 'build'),
     }),
+    ServeStaticModule.forRoot(
+      {
+        serveRoot: join(__dirname, "..", "uploadedFiles", "avatars"),
+      }
+    )
   ],
   controllers: [AppController, TasksController, UsersController],
   providers: [TasksService],

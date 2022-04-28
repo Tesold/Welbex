@@ -1,10 +1,9 @@
 import { CacheModule, forwardRef, Module } from '@nestjs/common';
-import { JwtModule } from '@nestjs/jwt';
 import { AuthModuleOptions } from '@nestjs/passport';
+import { MulterModule } from '@nestjs/platform-express';
 import { SequelizeModule } from '@nestjs/sequelize';
 import { AppModule } from 'src/app.module';
 import { AuthModule } from 'src/auth/auth.module';
-import { jwtConstants } from 'src/auth/constants';
 import { UsersModule } from 'src/users/users.module';
 import { TasksController } from './tasks.controller';
 import { Task } from './tasks.model';
@@ -14,6 +13,11 @@ import { TasksService } from './tasks.service';
   controllers: [TasksController],
   providers: [TasksService, AuthModuleOptions],
   imports: [
+    MulterModule.registerAsync({
+      useFactory: () => ({
+        dest: './upload',
+      }),
+    }),
     CacheModule.register(),
     SequelizeModule.forFeature([
       Task

@@ -17,7 +17,7 @@ export class AuthService {
         if (user) {
           let payload =JSON.parse(JSON.stringify({user}));
 
-          payload = {Nickname: payload.user.Nickname};
+          payload = {ID:payload.user.ID, Nickname: payload.user.Nickname};
       
           const crypto = require('crypto');
           const refreshToken = crypto.randomBytes(512).toString('hex');

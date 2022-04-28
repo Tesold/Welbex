@@ -1,6 +1,5 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
-import { CreateUserDto } from './create-user.dto';
 import { User } from './users.model';
 import * as bcrypt from 'bcrypt';
 
@@ -10,15 +9,15 @@ export class UsersService {
         @InjectModel(User) private userRepository: typeof User,
       ) {}
 
-    async createUser(dto: CreateUserDto) {
-
+    async createUser(Nickname, Password) {
         try{
+            const salt = await bcrypt.genSalt();
             const password = await this.createUserPassword(
-             dto.PasswordHash,
-                dto.Salt,
+             Password,
+             salt
             );
 
-            const user = await this.userRepository.create({Nickname: dto.Nickname, Salt: dto.Salt, PasswordHash: password});
+            const user = await this.userRepository.create({Nickname, Salt: salt, PasswordHash: password});
     
             return user;
         }

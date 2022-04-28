@@ -1,4 +1,4 @@
-import { IsEmail, IsNumber, IsString, Length } from "class-validator";
+import { IsNumber, Length } from "class-validator";
 
 export class CreateTaskDto{
 
@@ -8,4 +8,8 @@ export class CreateTaskDto{
 
     @Length(3, 64)
     readonly Text: string;
+
+    readonly PathImage: string;
+
+    readonly PathVideo: string;
 }

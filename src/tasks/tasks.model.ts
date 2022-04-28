@@ -1,4 +1,3 @@
-import { IsEmail, isEmail } from 'class-validator';
 import {
     Model,
     Table,
@@ -28,11 +27,17 @@ import { User } from 'src/users/users.model';
     ID: number;
   
     @ForeignKey(() => User)
-    @Column({ type: DataType.TEXT, allowNull: false})
-    UserID: string;
+    @Column({ type: DataType.INTEGER, allowNull: false})
+    UserID: number;
 
     @Column({ type: DataType.TEXT, allowNull: false })
     Text: string;
+
+    @Column({ type: DataType.TEXT, allowNull: true })
+    PathImage: string;
+
+    @Column({ type: DataType.TEXT, allowNull: true })
+    PathVideo: string;
 
     @Column({ type: DataType.BOOLEAN, defaultValue: false })
     Edited: boolean;

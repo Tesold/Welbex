@@ -1,24 +1,22 @@
 import { Body, Controller, Get, Post } from '@nestjs/common';
-import { CreateUserDto } from './create-user.dto';
 import { UsersService } from './users.service';
 import * as bcrypt from 'bcrypt';
+import { ApiBody } from '@nestjs/swagger';
 
 @Controller('users')
 export class UsersController {
     constructor(private userService: UsersService) {}
 
+
+    @ApiBody({schema:{
+      type: 'object', 
+      properties:{
+          Nickname: { type: 'string' },
+          Password: {type: 'string'}
+      }}
+    })
     @Post('/create')
-    create(@Body() userDto: CreateUserDto) {
-      return this.userService.createUser(userDto);
-    }
-
-    @Post('/createpass')
-    createPass(@Body() {password, salt}) {
-      return this.userService.createUserPassword(password, salt);
-    }
-
-    @Get('/gensalt')
-    async genSalt() {
-      return bcrypt.genSalt();
+    create(@Body() user) {
+      return this.userService.createUser(user.Nickname, user.Password);
     }
 }

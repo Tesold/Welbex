@@ -1,8 +1,9 @@
-import { Controller, Post, UseGuards, Request, Body } from '@nestjs/common';
+import { Controller, Post, UseGuards, Request, Body, Get } from '@nestjs/common';
 import { ApiBody, ApiOperation } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
 import { JwtAuthGuard } from './jwtAuth.guard';
 import { LocalAuthGuard } from './localAuth.guard';
+import * as bcrypt from 'bcrypt';
 
 @Controller('auth')
 export class AuthController {
@@ -49,10 +50,5 @@ export class AuthController {
     @Post('/refresh')
     async Refresh(@Body() { Nickname, refresh_token }) {
       return this.authService.getToken(Nickname, refresh_token);
-    }
-
-    @Post('/salt')
-    async Salt(@Body() { Nickname }) {
-      return this.authService.getSalt(Nickname);
     }
 }

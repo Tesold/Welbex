@@ -1,8 +1,8 @@
-import { Body, Controller, Get, Param, Post, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Get, Request, Post, UploadedFile, UseGuards, UseInterceptors, StreamableFile, Param } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiBearerAuth, ApiBody, ApiOperation } from '@nestjs/swagger';
+import { diskStorage } from 'multer';
 import { JwtAuthGuard } from 'src/auth/jwtAuth.guard';
-import { CreateTaskDto } from './dto/createTask.dto';
 import { TasksService } from './tasks.service';
 
 @Controller('tasks')
@@ -10,22 +10,48 @@ export class TasksController {
 
     constructor(
         private readonly tasksService: TasksService
-        ) {}
-
-        
-    
+        ) { }
+          
     @ApiBody({schema:{
         type: 'object', 
         properties:{
             Text: { type: 'string' },
+            file: {type: 'file'}
         }}
     })
     @ApiOperation({summary: "Создать новую запись"})
-    @UseInterceptors(FileInterceptor('file'))
+    @UseGuards(JwtAuthGuard)
     @Post('/create')
-    async CreateTask(@UploadedFile() file: Express.Multer.File, @Body() task:CreateTaskDto)
+    @UseInterceptors(FileInterceptor('blog_image', {
+        storage: diskStorage({
+          destination: './uploadedFiles/avatars',
+          filename: (req, file, cb)=>{
+            cb(null, ""+Date.now()+file.originalname)},
+        },
+        ),
+        fileFilter: (req, file, cb) => {
+  
+            if(file.mimetype === "image/png" || 
+            file.mimetype === "image/jpg"|| 
+            file.mimetype === "image/jpeg"||
+            file.mimetype === "video/mp4"
+            ){
+                cb(null, true);
+            }
+            else{
+                cb(null, false);
+            }
+         }   ,
+      }))
+    async CreateTask(@UploadedFile() file: Express.Multer.File, @Body() {body}, @Request() {user})
     {
-        return this.tasksService.createTask(task);
+        return this.tasksService.createTask({
+            Text: body,
+            UserID: user.ID, 
+            PathImage: file?.mimetype!=='video/mp4'?file?.path:null, 
+            PathVideo: file?.mimetype==='video/mp4'?file?.path:null
+        },
+             file);
     }
 
     @ApiOperation({summary: "Отредактировать запись"})
@@ -33,14 +59,22 @@ export class TasksController {
     @ApiBody({schema:{type: 'object', properties:{ID: {type: 'number'}, Text: {type: 'string'}}}})
     @UseGuards(JwtAuthGuard)
     @Post('/edit')
-    async EditTask(@Body() task)
+    async EditTask(@Request() {user, body})
     {
-        return this.tasksService.editTask(task.ID, task.Text);
+        return this.tasksService.editTask(body.ID, body.Text, user.ID);
     }
 
     @ApiOperation({summary: "Получить количество страниц"})
     @Get('/pages')
     getPages() {
       return this.tasksService.getPages();
+    }
+
+    @ApiOperation({summary: "Удалить пост"})
+    @ApiBody({schema:{type: 'object', properties:{ID: {type: 'number'}}}})
+    @UseGuards(JwtAuthGuard)
+    @Post('/delete')
+    deleteTask(@Request() {user, body}) {
+      return this.tasksService.deleteTask(body.ID, user.ID);
     }
 }
