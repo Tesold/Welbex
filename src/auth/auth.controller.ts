@@ -3,7 +3,6 @@ import { ApiBody, ApiOperation } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
 import { JwtAuthGuard } from './jwtAuth.guard';
 import { LocalAuthGuard } from './localAuth.guard';
-import * as bcrypt from 'bcrypt';
 
 @Controller('auth')
 export class AuthController {
@@ -13,8 +12,8 @@ export class AuthController {
     @ApiBody({schema:{
         type: 'object', 
         properties:{
-            Nickname:{ type: 'string' },
-            PasswordHash:{ type: "string" },
+            username:{ type: 'string' },
+            password:{ type: "string" },
         }}
     })
     @ApiOperation({summary: "Войти"})
